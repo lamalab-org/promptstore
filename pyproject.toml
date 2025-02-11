@@ -26,7 +26,15 @@ dynamic = ["version"]
 license = { file = "LICENSE" }
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pytest-asyncio", "pytest-cov", "mypy>=1.8", "ruff>=0.2.0"]
+dev = [
+    "pytest>=8",
+    "pytest-asyncio",
+    "pytest-cov",
+    "mypy>=1.8",
+    "ruff>=0.2.0",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+]
 
 [project.urls]
 repository = "https://github.com/lamalab-org/promptstore"
