@@ -1,0 +1,85 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "promptstore"
+authors = [{ email = "hello@lamalab.org", name = "lamalab group members" }]
+description = "A lightweight package for managing and versioning LLM prompt templates"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python",
+]
+dependencies = ["jinja2>=3.0.0"]
+dynamic = ["version"]
+license = { file = "LICENSE" }
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio", "pytest-cov", "mypy>=1.8", "ruff>=0.2.0"]
+
+[project.urls]
+repository = "https://github.com/lamalab-org/promptstore"
+
+[tool.hatch]
+version.source = "vcs"
+
+[tool.hatch.build]
+packages = ["src/promptstore"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/promptstore"]
+
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+
+[tool.ruff]
+target-version = "py38"
+line-length = 88
+select = [
+    "E", # pycodestyle errors
+    "W", # pycodestyle warnings
+    "F", # pyflakes
+    "I", # isort
+    "B", # flake8-bugbear
+]
+
+[tool.ruff.lint]
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.pytest.ini_options]
+addopts = "--cov=src/promptstore --cov-report=term-missing"
+testpaths = ["tests"]
+
+[tool.coverage.paths]
+source = ["src", "*/site-packages"]
+
+[tool.coverage.run]
+branch = true
+source = ["promptstore"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
