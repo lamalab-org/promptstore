@@ -25,7 +25,7 @@ class PromptStore:
         """Initialize the storage directory and index."""
         self.location.mkdir(parents=True, exist_ok=True)
 
-        if not self.index_path.exists():
+        if not self.index_path.exists() and not self.readonly:
             self._save_index({})
 
     def _load_index(self) -> Dict:
