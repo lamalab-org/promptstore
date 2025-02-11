@@ -1,3 +1,6 @@
+[![Tests](https://github.com/lamalab/promptstore/actions/workflows/test.yml/badge.svg)](https://github.com/lamalab/promptstore/actions/workflows/test.yml)
+<!-- [![codecov](https://codecov.io/gh/lamalab/promptstore/branch/main/graph/badge.svg)](https://codecov.io/gh/lamalab/promptstore) -->
+
 # PromptStore
 
 A lightweight Python package for managing and versioning LLM prompt templates.
