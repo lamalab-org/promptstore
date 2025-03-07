@@ -59,7 +59,8 @@ result = prompt.fill({
 Similarly, you can use prompts from an online source:
 
 ```python
-url = "https://example.com/prompts.json"
+url = "https://raw.githubusercontent.com/awesome-org/prompt-collections/main/prompts.json"
+# Using a sample prompt collection hosted on GitHub.
 # Fill a prompt template
 prompt = store.get_online("prompt-uuid", url)
 result = prompt.fill({
