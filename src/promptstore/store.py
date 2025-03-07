@@ -3,7 +3,7 @@ import json
 import uuid
 from typing import List, Dict, Optional, Union, Iterator
 from datetime import datetime
-from jinja2 import Template
+import pystow
 from .prompt import Prompt
 from .exceptions import PromptNotFoundError, ReadOnlyStoreError
 
@@ -98,7 +98,16 @@ class PromptStore:
         description: Optional[str] = None,
         tags: Optional[List[str]] = None,
     ) -> Prompt:
-        """Add a new prompt to the store."""
+        """Add a new prompt to the store.
+        
+        Args:
+            content: The content of the prompt
+            description: A description of the prompt
+            tags: A list of tags for the prompt
+        
+        Returns:
+            Prompt: The newly created prompt
+        """
         if self.readonly:
             raise ReadOnlyStoreError("Cannot modify a read-only prompt store")
 
@@ -137,7 +146,15 @@ class PromptStore:
         )
 
     def get(self, uuid: str, version: Optional[int] = None) -> Prompt:
-        """Retrieve a prompt by its UUID."""
+        """Retrieve a prompt by its UUID.
+        
+        Args:
+            uuid: The UUID of the prompt to retrieve
+            version: The version of the prompt to retrieve
+        
+        Returns:
+            Prompt: The prompt object
+        """
         index = self._load_index()
         if uuid not in index:
             raise PromptNotFoundError(f"Prompt with UUID {uuid} not found")
@@ -170,7 +187,15 @@ class PromptStore:
         )
 
     def find(self, query: str, field: str = "description") -> List[Prompt]:
-        """Search for prompts based on a query."""
+        """Search for prompts based on a query.
+        
+        Args:
+            query: The search query
+            field: The field to search in (description, content, or tags)
+        
+        Returns:
+            List[Prompt]: A list of prompts matching the query
+        """
         if field not in ("description", "content", "tags"):
             raise ValueError("Field must be 'description', 'content', or 'tags'")
 
@@ -189,7 +214,15 @@ class PromptStore:
         return prompts
 
     def _data_to_prompt(self, uuid: str, data: Dict) -> Prompt:
-        """Convert raw data to a Prompt object."""
+        """Convert raw data to a Prompt object.
+        
+        Args:
+            uuid: The UUID of the prompt
+            data: The raw data for the prompt
+        
+        Returns:
+            Prompt: The prompt object
+        """
         return Prompt(
             uuid=uuid,
             content=data["content"],
@@ -200,7 +233,15 @@ class PromptStore:
         )
 
     def merge(self, other: "PromptStore", override: bool = False):
-        """Merge another PromptStore into this one."""
+        """Merge another PromptStore into this one.
+        
+        Args:
+            other: The other PromptStore to merge
+            override: If True, override existing prompts with those from the other store
+        
+        Raises:
+            ReadOnlyStoreError: If the store is read-only
+        """
         if self.readonly:
             raise ReadOnlyStoreError("Cannot modify a read-only prompt store")
 
@@ -218,3 +259,109 @@ class PromptStore:
         index = self._load_index()
         for uuid, data in index.items():
             yield self._data_to_prompt(uuid, data)
+
+    def update(
+        self,
+        uuid: str,
+        content: str,
+        description: Optional[str] = None,
+        tags: Optional[List[str]] = None,
+    ) -> Prompt:
+        """Update an existing prompt with a new version.
+    
+        Args:
+            uuid: The UUID of the prompt to update
+            content: New content for the prompt
+            description: New description for the prompt
+            tags: New tags for the prompt
+    
+        Returns:
+            Prompt: The updated prompt
+    
+        Raises:
+            ReadOnlyStoreError: If the store is read-only
+            PromptNotFoundError: If the prompt with the given UUID doesn't exist
+        """
+        if self.readonly:
+            raise ReadOnlyStoreError("Cannot modify a read-only prompt store")
+    
+        index = self._load_index()
+        if uuid not in index:
+            raise PromptNotFoundError(f"Prompt with UUID {uuid} not found")
+    
+        prompt_data = index[uuid]
+        now = datetime.utcnow().isoformat()
+        
+        new_version = prompt_data["version"] + 1
+        
+        prompt_data["versions"].append({
+            "content": content,
+            "description": description,
+            "version": new_version,
+            "created_at": now,
+        })
+        
+        prompt_data["content"] = content
+        if description is not None:
+            prompt_data["description"] = description
+        if tags is not None:
+            prompt_data["tags"] = tags
+        prompt_data["version"] = new_version
+        prompt_data["updated_at"] = now
+        
+        self._save_index(index)
+        
+        return Prompt(
+            uuid=uuid,
+            content=content,
+            description=description if description is not None else prompt_data["description"],
+            version=new_version,
+            tags=tags if tags is not None else prompt_data["tags"],
+            timestamp=now,
+        )
+
+    def get_online(self, uuid: str, url: str, version: int | None = None) -> Prompt:
+        """Retrieve a prompt by its UUID from an online store.
+        
+        Args:
+            uuid: The UUID of the prompt to retrieve
+            url: The URL of the online store
+            version: The version of the prompt to retrieve
+        
+        Returns:
+            Prompt: The prompt object
+            
+        Raises:
+            PromptNotFoundError: If the prompt with the given UUID doesn't exist
+        """
+        data = pystow.ensure_json("prompts", url=url)
+        
+        if uuid not in data:
+            raise PromptNotFoundError(f"Prompt with UUID {uuid} not found in online store")
+    
+        prompt_data = data[uuid]
+        
+        if version:
+            version_data = next(
+                (v for v in prompt_data["versions"] if v["version"] == version), None
+            )
+            if not version_data:
+                raise PromptNotFoundError(
+                    f"Version {version} of prompt {uuid} not found in online store"
+                )
+            content = version_data["content"]
+            description = version_data["description"]
+            timestamp = version_data["created_at"]
+        else:
+            content = prompt_data["content"]
+            description = prompt_data["description"]
+            timestamp = prompt_data["updated_at"]
+        
+        return Prompt(
+            uuid=uuid,
+            content=content,
+            description=description,
+            version=prompt_data["version"],
+            tags=prompt_data["tags"],
+            timestamp=timestamp,
+        )
