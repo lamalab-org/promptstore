@@ -41,10 +41,9 @@ filled = prompt.fill({
 })
 ```
 
-
 ## Documentation
 
-Full documentation is available at [lamalab-org.github.io/promptstore](https://lamalab-org.github.io/chem-bench/).
+Full documentation is available at [lamalab-org.github.io/promptstore](https://lamalab-org.github.io/promptstore/).
 
 ## License
 

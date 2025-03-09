@@ -55,3 +55,16 @@ result = prompt.fill({
     "task": "sorts a list in ascending order"
 })
 ```
+
+Similarly, you can use prompts from an online source:
+
+```python
+url = "https://raw.githubusercontent.com/awesome-org/prompt-collections/main/prompts.json"
+# Using a sample prompt collection hosted on GitHub.
+# Fill a prompt template
+prompt = store.get_online("prompt-uuid", url)
+result = prompt.fill({
+    "language": "Python",
+    "task": "sorts a list in ascending order"
+})
+```
