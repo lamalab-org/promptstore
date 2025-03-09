@@ -296,7 +296,7 @@ class PromptStore:
         
         prompt_data["versions"].append({
             "content": content,
-            "description": description,
+            "description": description if description is not None else prompt_data["description"],
             "version": new_version,
             "created_at": now,
         })
@@ -320,13 +320,14 @@ class PromptStore:
             timestamp=now,
         )
 
-    def get_online(self, uuid: str, url: str, version: int | None = None) -> Prompt:
+    def get_online(self, uuid: str, url: str, version: int | None = None, folder: str = "prompts") -> Prompt:
         """Retrieve a prompt by its UUID from an online store.
         
         Args:
             uuid: The UUID of the prompt to retrieve
             url: The URL of the online store
             version: The version of the prompt to retrieve
+            folder: The folder name to use for caching (defaults to "prompts")
         
         Returns:
             Prompt: The prompt object
@@ -334,7 +335,7 @@ class PromptStore:
         Raises:
             PromptNotFoundError: If the prompt with the given UUID doesn't exist
         """
-        data = pystow.ensure_json("prompts", url=url)
+        data = pystow.ensure_json(folder, url=url)
         
         if uuid not in data:
             raise PromptNotFoundError(f"Prompt with UUID {uuid} not found in online store")

@@ -21,6 +21,10 @@ class Prompt:
         self._template = Template(content)
         self.variables = self._extract_variables(content)
 
+    def fill(self, variables: dict) -> str:
+        """Fill the prompt template with provided variables."""
+        return self._template.render(**variables)
+
     def _extract_variables(self, content: str) -> List[str]:
         """Extract variable names from the template content."""
         env = Environment()
