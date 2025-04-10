@@ -204,14 +204,14 @@ class PromptStore:
         index = self._load_index()
         prompts = []
 
-        for uuid, data in index.items():
+        for uuid_, data in index.items():
             if field == "tags":
                 if any(query.lower() in tag.lower() for tag in data["tags"]):
-                    prompts.append(self._data_to_prompt(uuid, data))
+                    prompts.append(self._data_to_prompt(uuid_, data))
             else:
                 value = data.get(field, "")
                 if value and query.lower() in value.lower():
-                    prompts.append(self._data_to_prompt(uuid, data))
+                    prompts.append(self._data_to_prompt(uuid_, data))
 
         return prompts
 
@@ -250,17 +250,17 @@ class PromptStore:
         our_index = self._load_index()
         their_index = other._load_index()
 
-        for uuid, their_data in their_index.items():
+        for uuid_, their_data in their_index.items():
             if uuid not in our_index or override:
-                our_index[uuid] = their_data
+                our_index[uuid_] = their_data
 
         self._save_index(our_index)
 
     def __iter__(self) -> Iterator[Prompt]:
         """Iterate over all prompts in the store."""
         index = self._load_index()
-        for uuid, data in index.items():
-            yield self._data_to_prompt(uuid, data)
+        for uuid_, data in index.items():
+            yield self._data_to_prompt(uuid_, data)
 
     def update(
         self,
