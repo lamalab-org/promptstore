@@ -1,5 +1,4 @@
-[![Tests](https://github.com/lamalab/promptstore/actions/workflows/test.yml/badge.svg)](https://github.com/lamalab/promptstore/actions/workflows/test.yml)
-<!-- [![codecov](https://codecov.io/gh/lamalab/promptstore/branch/main/graph/badge.svg)](https://codecov.io/gh/lamalab/promptstore) -->
+[![Tests](https://github.com/lamalab-org/promptstore/actions/workflows/test.yml/badge.svg)](https://github.com/lamalab-org/promptstore/actions/workflows/test.yml)
 
 # PromptStore
 
