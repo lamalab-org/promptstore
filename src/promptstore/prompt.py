@@ -1,5 +1,6 @@
 from typing import List, Optional
-from jinja2 import Template, meta, Environment
+
+from jinja2 import Environment, Template, meta
 
 
 class Prompt:

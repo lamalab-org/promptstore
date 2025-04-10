@@ -1,11 +1,13 @@
-from pathlib import Path
 import json
 import uuid
-from typing import List, Dict, Optional, Union, Iterator
 from datetime import datetime
+from pathlib import Path
+from typing import Dict, Iterator, List, Optional, Union
+
 import pystow
-from .prompt import Prompt
+
 from .exceptions import PromptNotFoundError, ReadOnlyStoreError
+from .prompt import Prompt
 
 
 class PromptStore:
@@ -99,12 +101,12 @@ class PromptStore:
         tags: Optional[List[str]] = None,
     ) -> Prompt:
         """Add a new prompt to the store.
-        
+
         Args:
             content: The content of the prompt
             description: A description of the prompt
             tags: A list of tags for the prompt
-        
+
         Returns:
             Prompt: The newly created prompt
         """
@@ -147,11 +149,11 @@ class PromptStore:
 
     def get(self, uuid: str, version: Optional[int] = None) -> Prompt:
         """Retrieve a prompt by its UUID.
-        
+
         Args:
             uuid: The UUID of the prompt to retrieve
             version: The version of the prompt to retrieve
-        
+
         Returns:
             Prompt: The prompt object
         """
@@ -188,11 +190,11 @@ class PromptStore:
 
     def find(self, query: str, field: str = "description") -> List[Prompt]:
         """Search for prompts based on a query.
-        
+
         Args:
             query: The search query
             field: The field to search in (description, content, or tags)
-        
+
         Returns:
             List[Prompt]: A list of prompts matching the query
         """
@@ -215,11 +217,11 @@ class PromptStore:
 
     def _data_to_prompt(self, uuid: str, data: Dict) -> Prompt:
         """Convert raw data to a Prompt object.
-        
+
         Args:
             uuid: The UUID of the prompt
             data: The raw data for the prompt
-        
+
         Returns:
             Prompt: The prompt object
         """
@@ -234,11 +236,11 @@ class PromptStore:
 
     def merge(self, other: "PromptStore", override: bool = False):
         """Merge another PromptStore into this one.
-        
+
         Args:
             other: The other PromptStore to merge
             override: If True, override existing prompts with those from the other store
-        
+
         Raises:
             ReadOnlyStoreError: If the store is read-only
         """
@@ -268,39 +270,43 @@ class PromptStore:
         tags: Optional[List[str]] = None,
     ) -> Prompt:
         """Update an existing prompt with a new version.
-    
+
         Args:
             uuid: The UUID of the prompt to update
             content: New content for the prompt
             description: New description for the prompt
             tags: New tags for the prompt
-    
+
         Returns:
             Prompt: The updated prompt
-    
+
         Raises:
             ReadOnlyStoreError: If the store is read-only
             PromptNotFoundError: If the prompt with the given UUID doesn't exist
         """
         if self.readonly:
             raise ReadOnlyStoreError("Cannot modify a read-only prompt store")
-    
+
         index = self._load_index()
         if uuid not in index:
             raise PromptNotFoundError(f"Prompt with UUID {uuid} not found")
-    
+
         prompt_data = index[uuid]
         now = datetime.utcnow().isoformat()
-        
+
         new_version = prompt_data["version"] + 1
-        
-        prompt_data["versions"].append({
-            "content": content,
-            "description": description if description is not None else prompt_data["description"],
-            "version": new_version,
-            "created_at": now,
-        })
-        
+
+        prompt_data["versions"].append(
+            {
+                "content": content,
+                "description": description
+                if description is not None
+                else prompt_data["description"],
+                "version": new_version,
+                "created_at": now,
+            }
+        )
+
         prompt_data["content"] = content
         if description is not None:
             prompt_data["description"] = description
@@ -308,40 +314,46 @@ class PromptStore:
             prompt_data["tags"] = tags
         prompt_data["version"] = new_version
         prompt_data["updated_at"] = now
-        
+
         self._save_index(index)
-        
+
         return Prompt(
             uuid=uuid,
             content=content,
-            description=description if description is not None else prompt_data["description"],
+            description=description
+            if description is not None
+            else prompt_data["description"],
             version=new_version,
             tags=tags if tags is not None else prompt_data["tags"],
             timestamp=now,
         )
 
-    def get_online(self, uuid: str, url: str, version: int | None = None, folder: str = "prompts") -> Prompt:
+    def get_online(
+        self, uuid: str, url: str, version: int | None = None, folder: str = "prompts"
+    ) -> Prompt:
         """Retrieve a prompt by its UUID from an online store.
-        
+
         Args:
             uuid: The UUID of the prompt to retrieve
             url: The URL of the online store
             version: The version of the prompt to retrieve
             folder: The folder name to use for caching (defaults to "prompts")
-        
+
         Returns:
             Prompt: The prompt object
-            
+
         Raises:
             PromptNotFoundError: If the prompt with the given UUID doesn't exist
         """
         data = pystow.ensure_json(folder, url=url)
-        
+
         if uuid not in data:
-            raise PromptNotFoundError(f"Prompt with UUID {uuid} not found in online store")
-    
+            raise PromptNotFoundError(
+                f"Prompt with UUID {uuid} not found in online store"
+            )
+
         prompt_data = data[uuid]
-        
+
         if version:
             version_data = next(
                 (v for v in prompt_data["versions"] if v["version"] == version), None
@@ -357,7 +369,7 @@ class PromptStore:
             content = prompt_data["content"]
             description = prompt_data["description"]
             timestamp = prompt_data["updated_at"]
-        
+
         return Prompt(
             uuid=uuid,
             content=content,

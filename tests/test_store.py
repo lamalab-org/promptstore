@@ -67,23 +67,17 @@ def test_readonly_store(temp_store_dir):
     """Test that readonly store prevents modifications."""
     # First create a writable store with some data
     store = PromptStore(temp_store_dir)
-    prompt = store.add(
-        content="test content",
-        description="test description"
-    )
-    
+    prompt = store.add(content="test content", description="test description")
+
     # Then create a readonly store at the same location
     readonly_store = PromptStore(temp_store_dir, readonly=True)
-    
+
     # Should be able to read
     assert readonly_store.get(prompt.uuid).content == "test content"
-    
+
     # But not write
     with pytest.raises(ReadOnlyStoreError):
-        readonly_store.add(
-            content="new content",
-            description="new description"
-        )
+        readonly_store.add(content="new content", description="new description")
 
 
 def test_from_dict():
