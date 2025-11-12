@@ -54,6 +54,58 @@ result = prompt.fill({
     "language": "Python",
     "task": "sorts a list in ascending order"
 })
+
+# Get list of variables in a prompt
+variables = prompt.get_variables()
+print(f"Required variables: {variables}")  # ['language', 'task']
+```
+
+### Exporting and Importing Prompts
+
+Prompts can be exported to Markdown format with YAML frontmatter. When exported, template variables are automatically highlighted for better visibility:
+
+```python
+# Export prompt to markdown
+markdown = prompt.to_markdown()
+print(markdown)
+```
+
+Example output:
+
+```markdown
+---
+uuid: 6172841b-e296-4d4b-bb32-7b8a074ab36e
+name: code-generator
+namespace: default
+description: Code generation prompt
+version: 1
+tags:
+- coding
+- generation
+variables:
+- language
+- task
+---
+
+Write a **`{{language}}`** function that **`{{task}}`**
+```
+
+Variables are highlighted as **`{{variable}}`** (bold code blocks) in the markdown output, making them visually distinct and easier to identify.
+
+You can also load prompts from markdown:
+
+```python
+from promptstore import Prompt
+
+# Load from markdown file
+with open("prompt.md", "r") as f:
+    markdown_content = f.read()
+
+prompt = Prompt.from_markdown(markdown_content)
+
+# The highlighting is automatically removed when loading
+# and the prompt works exactly as before
+result = prompt.fill({"language": "Python", "task": "sorts a list"})
 ```
 
 Similarly, you can use prompts from an online source:

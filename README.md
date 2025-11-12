@@ -10,6 +10,7 @@ A lightweight Python package for managing and versioning LLM prompt templates.
 - Template versioning
 - Tag-based organization
 - Jinja2 template syntax
+- **Variable highlighting** in Markdown exports for better visibility
 - Package integration utilities
 
 ## Installation
@@ -28,9 +29,12 @@ store = PromptStore("./prompts")
 
 # Add a prompt template
 prompt = store.add(
+    name="example",
     content="Write a {{language}} function that {{task}}",
+    namespace="project1",
     description="Code generation prompt",
-    tags=["coding", "generation"]
+    tags=["coding", "generation"],
+    subset="subproject1"
 )
 
 # Use the prompt
