@@ -35,7 +35,7 @@ class Prompt:
         try:
             self._template = Template(content)
         except Exception as e:
-            raise ValueError(f"Invalid Jinja2 template: {e}")
+            raise ValueError(f"Invalid Jinja2 template: {e}") from e
         self.variables = self._extract_variables(content)
 
     @property
