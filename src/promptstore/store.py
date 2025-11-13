@@ -76,35 +76,20 @@ class PromptStore:
         """
         # Check if it's a UUID
         if self._is_uuid(identifier):
-            return {
-                "uuid": identifier,
-                "namespace": None,
-                "name": None,
-                "subset": None
-            }
+            return {"uuid": identifier, "namespace": None, "name": None, "subset": None}
 
         # Parse namespace/name[@subset]
-        pattern = r'^([^/]+)/([^@]+)(?:@(.+))?$'
+        pattern = r"^([^/]+)/([^@]+)(?:@(.+))?$"
         match = re.match(pattern, identifier)
 
         if not match:
             # If it doesn't match the pattern and is not a UUID,
             # treat it as a potential UUID for backward compatibility
-            return {
-                "uuid": identifier,
-                "namespace": None,
-                "name": None,
-                "subset": None
-            }
+            return {"uuid": identifier, "namespace": None, "name": None, "subset": None}
 
         namespace, name, subset = match.groups()
 
-        return {
-            "uuid": None,
-            "namespace": namespace,
-            "name": name,
-            "subset": subset
-        }
+        return {"uuid": None, "namespace": namespace, "name": name, "subset": subset}
 
     def _is_uuid(self, value: str) -> bool:
         """Check if a string is a valid UUID."""
@@ -119,7 +104,7 @@ class PromptStore:
         namespace: str,
         name: str,
         subset: Optional[str] = None,
-        version: Optional[int] = None
+        version: Optional[int] = None,
     ) -> Path:
         """Get the file path for a prompt.
 
@@ -207,7 +192,7 @@ class PromptStore:
             index[uuid_val] = {
                 "namespace": namespace,
                 "name": name,
-                "path": str(file_path.relative_to(store.location))
+                "path": str(file_path.relative_to(store.location)),
             }
             store._save_index(index)
 
@@ -301,7 +286,7 @@ class PromptStore:
             "namespace": namespace,
             "name": name,
             "subset": subset,
-            "path": str(file_path.relative_to(self.location))
+            "path": str(file_path.relative_to(self.location)),
         }
         self._save_index(index)
 
@@ -319,7 +304,7 @@ class PromptStore:
         self,
         identifier: str,
         version: Optional[int] = None,
-        subset: Optional[str] = None
+        subset: Optional[str] = None,
     ) -> Prompt:
         """Retrieve a prompt by its identifier or UUID.
 
@@ -338,7 +323,7 @@ class PromptStore:
             warnings.warn(
                 "UUID-based lookup is deprecated. Use 'namespace/name' format.",
                 DeprecationWarning,
-                stacklevel=2
+                stacklevel=2,
             )
             return self._get_by_uuid(parsed["uuid"], version)
 

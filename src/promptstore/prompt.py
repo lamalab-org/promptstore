@@ -66,14 +66,14 @@ class Prompt:
 
     def _highlight_variables(self, content: str) -> str:
         """Highlight Jinja2 variables in markdown format."""
-        pattern = r'(\{\{[^}]+\}\})'
-        return re.sub(pattern, r'**`\1`**', content)
+        pattern = r"(\{\{[^}]+\}\})"
+        return re.sub(pattern, r"**`\1`**", content)
 
     @staticmethod
     def _unhighlight_variables(content: str) -> str:
         """Remove markdown highlighting from Jinja2 variables."""
-        pattern = r'\*\*`(\{\{[^}]+\}\})`\*\*'
-        return re.sub(pattern, r'\1', content)
+        pattern = r"\*\*`(\{\{[^}]+\}\})`\*\*"
+        return re.sub(pattern, r"\1", content)
 
     def to_markdown(self) -> str:
         """Export prompt as Markdown with YAML frontmatter."""
@@ -97,9 +97,7 @@ class Prompt:
         # Remove None values
         frontmatter = {k: v for k, v in frontmatter.items() if v is not None}
 
-        yaml_str = yaml.dump(
-            frontmatter, default_flow_style=False, sort_keys=False
-        )
+        yaml_str = yaml.dump(frontmatter, default_flow_style=False, sort_keys=False)
 
         highlighted_content = self._highlight_variables(self.content)
 
@@ -109,9 +107,7 @@ class Prompt:
     def from_markdown(cls, markdown_content: str) -> "Prompt":
         """Create prompt from Markdown with YAML frontmatter."""
         if not markdown_content.startswith("---"):
-            raise ValueError(
-                "Markdown content must start with YAML frontmatter"
-            )
+            raise ValueError("Markdown content must start with YAML frontmatter")
 
         parts = markdown_content.split("---", 2)
         if len(parts) < 3:

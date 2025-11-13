@@ -247,4 +247,3 @@ def test_to_markdown_and_from_markdown(store):
     assert restored.version == original.version
     assert restored.tags == original.tags
     assert restored.uuid == original.uuid
-

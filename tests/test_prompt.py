@@ -102,4 +102,3 @@ def test_markdown_roundtrip_with_highlighting():
     assert loaded.description == original.description
     assert loaded.tags == original.tags
     assert loaded.variables == original.variables
-
