@@ -42,7 +42,7 @@ print(markdown)
 
 ## Variable Highlighting
 
-When you export prompts to markdown, template variables are automatically highlighted with bold code formatting (**`{{variable}}`**), making them stand out visually. This is especially useful when:
+When the prompts are stored, they are saved in markdown format where template variables are automatically highlighted with bold code formatting (**`{{variable}}`**), making them stand out visually. This is especially useful when:
 
 - Reviewing prompts in markdown viewers or editors
 - Sharing prompts with team members
@@ -50,6 +50,25 @@ When you export prompts to markdown, template variables are automatically highli
 - Identifying which parts of the prompt need to be filled
 
 The highlighting is automatically removed when loading prompts from markdown, so your templates work seamlessly.
+
+## Using Prompts
+
+PromptStore provides a simple Hugging Face-like identifier to manage and use prompts. For that simply use the `get` method indicating the prompt by its name, namespace, and subset:
+
+```python
+# Add a prompt template
+prompt = store.get("namespace/name@subset")
+```
+
+Old way to get and use prompts is by checking the UUID:
+
+```python
+# Fill a prompt template
+prompt = store.get("prompt-uuid")
+result = prompt.fill({
+    "language": "Python",
+    "task": "sorts a list in ascending order"
+})
 
 ## Next Steps
 

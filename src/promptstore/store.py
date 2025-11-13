@@ -68,10 +68,10 @@ class PromptStore:
     def _parse_identifier(self, identifier: str) -> Dict[str, Optional[str]]:
         """Parse HuggingFace-style identifier.
 
-        Format: namespace/name[@subset][@version]
+        Format: namespace/name[@subset]
 
         Returns:
-            Dict with keys: namespace, name, subset, version
+            Dict with keys: namespace, name, subset
         """
         # Check if it's a UUID
         if self._is_uuid(identifier):
@@ -79,12 +79,11 @@ class PromptStore:
                 "uuid": identifier,
                 "namespace": None,
                 "name": None,
-                "subset": None,
-                "version": None
+                "subset": None
             }
 
-        # Parse namespace/name[@subset][@version]
-        pattern = r'^([^/]+)/([^@]+)(?:@([^@]+))?(?:@v?(\d+))?$'
+        # Parse namespace/name[@subset]
+        pattern = r'^([^/]+)/([^@]+)(?:@(.+))?$'
         match = re.match(pattern, identifier)
 
         if not match:
@@ -96,27 +95,16 @@ class PromptStore:
                 "uuid": identifier,
                 "namespace": None,
                 "name": None,
-                "subset": None,
-                "version": None
+                "subset": None
             }
 
-        namespace, name, subset_or_version, version = match.groups()
-
-        # Determine if the third group is a subset or version
-        subset = None
-        if subset_or_version:
-            if subset_or_version.startswith('v') or subset_or_version.isdigit():
-                version = subset_or_version.lstrip('v')
-                subset = None
-            else:
-                subset = subset_or_version
+        namespace, name, subset = match.groups()
 
         return {
             "uuid": None,
             "namespace": namespace,
             "name": name,
-            "subset": subset,
-            "version": int(version) if version else None
+            "subset": subset
         }
 
     def _is_uuid(self, value: str) -> bool:
@@ -337,9 +325,9 @@ class PromptStore:
         """Retrieve a prompt by its identifier or UUID.
 
         Args:
-            identifier: HuggingFace-style identifier or UUID
+            identifier: HuggingFace-style identifier (namespace/name[@subset]) or UUID
             version: The version of the prompt to retrieve
-            subset: The subset of the prompt to retrieve
+            subset: The subset of the prompt to retrieve (overrides identifier)
 
         Returns:
             Prompt: The prompt object
@@ -359,7 +347,6 @@ class PromptStore:
         namespace = parsed["namespace"]
         name = parsed["name"]
         subset = subset or parsed["subset"]
-        version = version or parsed["version"]
 
         # Get the file path and read the prompt
         file_path = self._get_prompt_path(namespace, name, subset, version)

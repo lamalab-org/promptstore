@@ -44,6 +44,42 @@ filled = prompt.fill({
 })
 ```
 
+This automatically generates a markdown representation like this:
+
+```markdown
+---
+uuid: 77a6b015-efea-436e-8636-6ae06c438ad8
+name: example
+namespace: project1
+description: Code generation prompt
+version: 1
+tags:
+- coding
+- generation
+variables:
+- language
+- task
+subset: subproject1
+created_at: '2025-11-12T11:17:24.128334+00:00'
+updated_at: '2025-11-12T11:17:24.128334+00:00'
+---
+
+Write a **`{{language}}`** function that **`{{task}}`**
+```
+
+This makes it easy to identify which parts of the prompt are variables when viewing the markdown files.
+
+## Prompt Usage
+
+```python
+# Fill a prompt template
+prompt = store.get("namespace/name@subset")
+result = prompt.fill({
+    "language": "Python",
+    "task": "sorts a list in ascending order"
+})
+```
+
 ## Documentation
 
 Full documentation is available at [lamalab-org.github.io/promptstore](https://lamalab-org.github.io/promptstore/).
