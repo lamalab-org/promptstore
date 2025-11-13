@@ -4,12 +4,13 @@ import uuid
 import warnings
 from datetime import datetime, timezone
 from pathlib import Path
+from loguru import logger
 from typing import Dict, Iterator, List, Optional, Union
 
 import pystow
 
-from .exceptions import PromptNotFoundError, ReadOnlyStoreError
-from .prompt import Prompt
+from promptstore.exceptions import PromptNotFoundError, ReadOnlyStoreError
+from promptstore.prompt import Prompt
 
 
 class PromptStore:
@@ -89,8 +90,6 @@ class PromptStore:
         if not match:
             # If it doesn't match the pattern and is not a UUID,
             # treat it as a potential UUID for backward compatibility
-            # This handles cases like "nonexistent-uuid" which might be
-            # a malformed UUID that we still want to look up
             return {
                 "uuid": identifier,
                 "namespace": None,
@@ -258,7 +257,7 @@ class PromptStore:
 
         Args:
             content: The content of the prompt
-            name: Name of the prompt (required for new system)
+            name: Name of the prompt (optional, auto-generated if not provided)
             namespace: Namespace/organization (defaults to 'default')
             description: A description of the prompt
             tags: A list of tags for the prompt
@@ -462,7 +461,8 @@ class PromptStore:
             try:
                 file_path = self.location / entry["path"]
                 yield self._read_prompt_file(file_path)
-            except Exception:
+            except Exception as e:
+                logger.warning(f"Failed to read prompt at {file_path}: {e}")
                 # Skip prompts that can't be read
                 continue
 

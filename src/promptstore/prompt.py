@@ -32,7 +32,10 @@ class Prompt:
         self.timestamp = timestamp
         self.created_at = created_at
         self.updated_at = updated_at
-        self._template = Template(content)
+        try:
+            self._template = Template(content)
+        except Exception as e:
+            raise ValueError(f"Invalid Jinja2 template: {e}")
         self.variables = self._extract_variables(content)
 
     @property
@@ -62,24 +65,15 @@ class Prompt:
         return self.variables
 
     def _highlight_variables(self, content: str) -> str:
-        """Highlight Jinja2 variables in markdown format.
-
-        Converts {{variable}} to **`{{variable}}`** for visual emphasis.
-        """
-        # Match {{variable}} patterns and wrap them in **`...`**
+        """Highlight Jinja2 variables in markdown format."""
         pattern = r'(\{\{[^}]+\}\})'
-        highlighted = re.sub(pattern, r'**`\1`**', content)
-        return highlighted
+        return re.sub(pattern, r'**`\1`**', content)
 
-    def _unhighlight_variables(self, content: str) -> str:
-        """Remove markdown highlighting from Jinja2 variables.
-
-        Converts **`{{variable}}`** back to {{variable}}.
-        """
-        # Remove **`...`** wrapping from {{variable}} patterns
+    @staticmethod
+    def _unhighlight_variables(content: str) -> str:
+        """Remove markdown highlighting from Jinja2 variables."""
         pattern = r'\*\*`(\{\{[^}]+\}\})`\*\*'
-        unhighlighted = re.sub(pattern, r'\1', content)
-        return unhighlighted
+        return re.sub(pattern, r'\1', content)
 
     def to_markdown(self) -> str:
         """Export prompt as Markdown with YAML frontmatter."""
@@ -107,7 +101,6 @@ class Prompt:
             frontmatter, default_flow_style=False, sort_keys=False
         )
 
-        # Highlight variables in the content with bold code formatting
         highlighted_content = self._highlight_variables(self.content)
 
         return f"---\n{yaml_str}---\n\n{highlighted_content}"
@@ -129,10 +122,7 @@ class Prompt:
             raise ValueError("Empty frontmatter")
         content = parts[2].strip()
 
-        # Create a temporary instance to access _unhighlight_variables
-        # (we need this because it's an instance method)
-        temp_instance = cls.__new__(cls)
-        content = temp_instance._unhighlight_variables(content)
+        content = cls._unhighlight_variables(content)
 
         return cls(
             uuid=frontmatter.get("uuid"),

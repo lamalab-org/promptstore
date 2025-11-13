@@ -37,7 +37,7 @@ filled = prompt.fill({
 # Export to markdown (variables will be highlighted)
 markdown = prompt.to_markdown()
 print(markdown)
-# Output shows: Explain **`{{concept}}`** in simple terms
+# Output shows the prompt with **`{{language}}`** and **`{{task}}`** highlighted
 ```
 
 ## Variable Highlighting
