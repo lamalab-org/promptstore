@@ -30,11 +30,42 @@ prompt = store.add(
     description="Code generation prompt",
     tags=["coding", "generation"]
 )
+
+# Add to a specific namespace and subset
+prompt = store.add(
+    name="example",
+    content="This is a prompt for {{purpose}}",
+    namespace="project1",
+    description="Code generation prompt",
+    tags=["coding", "generation"],
+    subset="subproject1"
+)
 ```
+
+### Prompt management
+
+The prompts will be stored in the following structure:
+
+```prompts/
+└── namespace/
+    └── name/
+        └── subset/
+            └── subproject1.md
+```
+
+If no namespace is provided, the prompt will be stored in the `default` namespace. If no subset is provided, the prompt will be stored directly under the prompt name.
+
+On top of the markdown file, a YAML front matter is included with metadata about the prompt, including its UUID, version, tags, and variables.
 
 ### Retrieving Prompts
 
 ```python
+# Get by name and namespace
+prompt = store.get("namespace/name@subset")
+
+# Get an specific version
+old_version = store.get("namespace/name@subset", version=1)
+
 # Get by UUID
 prompt = store.get("prompt-uuid")
 
@@ -54,17 +85,8 @@ result = prompt.fill({
     "language": "Python",
     "task": "sorts a list in ascending order"
 })
-```
 
-Similarly, you can use prompts from an online source:
-
-```python
-url = "https://raw.githubusercontent.com/awesome-org/prompt-collections/main/prompts.json"
-# Using a sample prompt collection hosted on GitHub.
-# Fill a prompt template
-prompt = store.get_online("prompt-uuid", url)
-result = prompt.fill({
-    "language": "Python",
-    "task": "sorts a list in ascending order"
-})
+# Get list of variables in a prompt
+variables = prompt.get_variables()
+print(f"Required variables: {variables}")  # ['language', 'task']
 ```

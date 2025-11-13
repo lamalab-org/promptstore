@@ -19,7 +19,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python",
 ]
-dependencies = ["jinja2>=3.0.0", "pystow>=0.7.0"]
+dependencies = ["jinja2>=3.0.0", "pystow>=0.7.0", "loguru"]
 dynamic = ["version"]
 license = { file = "LICENSE" }
 
