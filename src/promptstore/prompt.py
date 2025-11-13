@@ -125,6 +125,8 @@ class Prompt:
             raise ValueError("Invalid frontmatter format")
 
         frontmatter = yaml.safe_load(parts[1])
+        if frontmatter is None:
+            raise ValueError("Empty frontmatter")
         content = parts[2].strip()
 
         # Create a temporary instance to access _unhighlight_variables
