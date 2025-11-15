@@ -1,9 +1,10 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
 name = "promptstore"
+version = "0.1.0"
 authors = [{ email = "hello@lamalab.org", name = "lamalab group members" }]
 description = "A lightweight package for managing and versioning LLM prompt templates"
 readme = "README.md"
@@ -20,7 +21,6 @@ classifiers = [
     "Programming Language :: Python",
 ]
 dependencies = ["jinja2>=3.0.0", "pystow>=0.7.0"]
-dynamic = ["version"]
 license = { file = "LICENSE" }
 
 [project.optional-dependencies]
@@ -36,9 +36,6 @@ dev = [
 
 [project.urls]
 repository = "https://github.com/lamalab-org/promptstore"
-
-[tool.hatch]
-version.source = "vcs"
 
 [tool.hatch.build]
 packages = ["src/promptstore"]

@@ -1,0 +1,49 @@
+name: Publish to PyPI
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  build-and-publish:
+    # Only run if the PR was actually merged (not just closed)
+    if: github.event.pull_request.merged == true
+
+    runs-on: ubuntu-latest
+
+    # Needed for OIDC / Trusted Publishing
+    permissions:
+      id-token: write
+      contents: read
+
+    # Must match the environment you configure on PyPI for Trusted Publishing
+    environment:
+      name: pypi
+      url: https://pypi.org/p/promptstore  # adjust if the project name changes
+    # version configured in the environment must match the version in pyproject.toml
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build
+
+      - name: Build distribution
+        run: python -m build  # creates dist/*.whl and dist/*.tar.gz
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          verbose: true
